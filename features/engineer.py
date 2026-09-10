@@ -1,6 +1,6 @@
 import pandas as pd
 
-def add_moving_averages(df: pd.DataFrame, windows: list[int] = [20, 50])-> pd.DataFrame:
+def add_moving_averages(df: pd.DataFrame, windows: list[int] = [20, 50, 100, 150])-> pd.DataFrame:
     """
     Add Simple Moving Average (SMA) columns for each window.
 
@@ -160,5 +160,12 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df = add_macd(df)
     df = add_volatility(df)
     df = add_volume_features(df)
-    df = df.dropna()
+    df = df.dropna(subset=[
+    "SMA_20", "SMA_50",
+    "EMA_12", "EMA_26",
+    "RSI_14",
+    "MACD", "MACD_Signal", "MACD_Hist",
+    "Volatility_20",
+    "Volume_SMA_20", "Volume_Ratio"
+])
     return df
