@@ -32,9 +32,11 @@ stock_predictor/
 │   ├── __init__.py
 │   └── fetch.py          # search_stock(), get_price_history(), get_stock_info()
 ├── features/
-│   └── __init__.py       # (empty - Step 2)
+│   |── __init__.py       # (empty - Step 2)
+    └── engineer.py 
 ├── models/
-│   └── __init__.py       # (empty - Step 3)
+│   ├── __init__.py
+│   └── train.py          # make_labels(), prepare_features(), split_time_series(),train_model(), evaluate_model()
 ├── ui/
 │   └── app.py            # Streamlit dashboard
 ├── requirements.txt
@@ -49,9 +51,9 @@ stock_predictor/
 - [x] **Step 2: Feature engineering** — RSI, MACD, moving averages (SMA 20/50/100/150),
       volatility, volume trends, computed from OHLCV data. **DONE, tested, working, and
       wired into `ui/app.py` with indicator charts.** Lives in `features/engineer.py`.
-- [ ] **Step 3: Baseline prediction model** — define label (e.g. next-day/next-week return direction),
+- [x] **Step 3: Baseline prediction model** — define label (e.g. next-day/next-week return direction),
       train baseline model (logistic regression / random forest) on engineered features.
-      Goes in `models/`.
+      Goes in `models/`. **DONE, tested, working.**
 - [ ] **Step 4: Web scraping + sentiment model** — scrape financial news/insight sites,
       train/use an NLP sentiment model on scraped text, separate from the price-based model.
 - [ ] **Step 5: Fusion layer** — combine price-model prediction + sentiment signal into
