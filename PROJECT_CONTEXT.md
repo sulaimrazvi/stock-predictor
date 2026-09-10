@@ -46,8 +46,9 @@ stock_predictor/
 
 - [x] **Step 1: Data fetching + basic UI** — yfinance integration, stock search, price history,
       fundamentals, Streamlit dashboard with candlestick chart. **DONE, tested, working.**
-- [x] **Step 2: Feature engineering** — RSI, MACD, moving averages, volatility, volume trends,
-      computed from OHLCV data. **DONE, tested, working.** Lives in `features/engineer.py`.
+- [x] **Step 2: Feature engineering** — RSI, MACD, moving averages (SMA 20/50/100/150),
+      volatility, volume trends, computed from OHLCV data. **DONE, tested, working, and
+      wired into `ui/app.py` with indicator charts.** Lives in `features/engineer.py`.
 - [ ] **Step 3: Baseline prediction model** — define label (e.g. next-day/next-week return direction),
       train baseline model (logistic regression / random forest) on engineered features.
       Goes in `models/`.
@@ -94,21 +95,38 @@ onward, follow the skeleton approach above.)
   UI (`ui/app.py`) NOT yet wired to display new features — that's a separate future task,
   not part of Step 2 as scoped.
 
+  - **2026-09-11 (cont'd)**: Re-added `SMA_100`/`SMA_150` to `add_moving_averages()` defaults
+  after confirming `5y` period fetch gives enough history for them to compute properly.
+  Fixed `engineer_features()` — changed blanket `df.dropna()` to `df.dropna(subset=[...])`
+  with only short-window columns (SMA_20/50, EMA_12/26, RSI_14, MACD family, Volatility_20,
+  Volume_SMA_20, Volume_Ratio) as required. SMA_100/150 now allowed to stay NaN early
+  without wiping out otherwise-valid rows — fixes the earlier all-or-nothing dropna issue.
+  Wired engineered features into `ui/app.py`: added `engineer_features(price_df.copy())`
+  call, plus three new chart panels below the existing candlestick/volume charts —
+  Price+MA overlay (SMA 20/50/100/150), RSI panel (with 30/70 reference lines), and
+  MACD panel (MACD + Signal lines + Histogram bars). Tested visually on RELIANCE-type
+  ticker with 5y period — SMA_100/150 lines correctly appear partway through the chart
+  once enough history exists, short indicators populate from near the start.
+  **Known issue found (not fixed yet)**: stock search for "reliance" matched a US-listed
+  "Reliance, Inc. (RS) - NYQ" result instead of NSE's RELIANCE.NS — `search_stock()` in
+  `data/fetch.py` may need better filtering/prioritization for NSE-only results.
+
 ## 7. Current State (update this section as the "latest snapshot")
 
-- **Last completed step**: Step 2 (feature engineering) - done, tested on RELIANCE.NS,
-  values sanity-checked, ready to commit
+- **Last completed step**: Step 2 (feature engineering) - done, tested, wired into UI
+  with indicator charts (MA overlay, RSI, MACD panels), committed
 - **Next step**: Step 3 - Baseline prediction model (define label, train logistic
   regression / random forest on engineered features) in `models/` folder. Will likely
   need to first increase `get_price_history()` fetch period (currently ~6mo/129 rows,
   too small for training) before starting Step 3.
 - **Repo**: https://github.com/sulaimrazvi/stock-predictor
-- **Open questions / decisions pending**:
-  - Increase yfinance fetch period before Step 3 (to get more training rows and
-    revisit SMA_100/150 viability)
-  - UI not yet updated to show new features - decide when to tackle that (own step,
-    or bundled with Step 3?)
-- **Known issues**: None currently
+- - **Open questions / decisions pending**:
+  - Confirm final fetch period to use for Step 3 model training (5y confirmed working
+    for SMA_100/150; decide default period for `get_price_history()` going forward)
+- **Known issues**:
+  - `search_stock()` in `data/fetch.py` can match wrong-market tickers (e.g. US-listed
+    "Reliance, Inc." instead of NSE's RELIANCE.NS) - needs NSE filtering/prioritization,
+    not yet fixed
 
 ## 8. Context Snapshot (for pasting into new AI sessions)
 
