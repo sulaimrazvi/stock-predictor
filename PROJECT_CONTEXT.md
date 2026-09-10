@@ -78,14 +78,19 @@ onward, follow the skeleton approach above.)
 
 <!-- Add a dated entry each session. Keep it brief - just what changed and any decisions made. -->
 
-- **2026-09-10**: Step 1 complete. Set up folder structure, `data/fetch.py`, `ui/app.py`
-  (Streamlit). Tested locally, working. Decided to defer FastAPI until a real need arises.
-  Decided on skeleton-based learning approach for Step 2 onward.
+- **2026-09-10**: Pushed Step 1 to GitHub (github.com/sulaimrazvi/stock-predictor).
+  Fixed .gitignore issue (venv `env/` folder was initially staged - resolved with
+  git reset + proper .gitignore before re-adding). Set up Claude Project with
+  PROJECT_CONTEXT.md + custom instructions for skeleton-based learning workflow.
+  Decided to do future steps in fresh chats within the Project, not one long chat.
 
 ## 7. Current State (update this section as the "latest snapshot")
 
-- **Last completed step**: Step 1
-- **Next step**: Step 2 - Feature engineering (RSI, MACD, moving averages, etc.)
+- **Last completed step**: Step 1 (data fetch + basic UI) - done, tested, pushed to GitHub
+- **Next step**: Step 2 - Feature engineering (RSI, MACD, moving averages, volatility, etc.)
+  in `features/` folder, following skeleton-based learning approach (concept + skeleton,
+  user implements, then review)
+- **Repo**: https://github.com/sulaimrazvi/stock-predictor
 - **Open questions / decisions pending**: None currently
 - **Known issues**: None currently
 
