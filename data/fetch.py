@@ -26,7 +26,7 @@ def search_stock(query: str, limit: int = 8):
     return cleaned
 
 
-def get_price_history(symbol: str, period: str = "6mo", interval: str = "1d") -> pd.DataFrame:
+def get_price_history(symbol: str, period: str = "2y", interval: str = "1d") -> pd.DataFrame:
     """Fetch OHLCV data for a given symbol (NSE symbols need '.NS' suffix)."""
     ticker = yf.Ticker(symbol)
     df = ticker.history(period=period, interval=interval)

@@ -142,6 +142,30 @@ def add_volume_features(df: pd.DataFrame, window: int = 20) -> pd.DataFrame:
     return df
 
 
+def add_lag_features(df: pd.DataFrame, lags: list = [1, 2, 3]) -> pd.DataFrame:
+    """Lag RSI and MACD values to capture indicator momentum."""
+    for lag in lags:
+        df[f'RSI_Lag_{lag}'] = df['RSI_14'].shift(lag)
+        df[f'MACD_Lag_{lag}'] = df['MACD'].shift(lag)
+    return df
+
+
+def add_rolling_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Rolling stats on returns + RSI momentum."""
+    df['Rolling_Mean_5'] = df['Daily_Return'].rolling(window=5).mean()
+    df['Rolling_Std_5'] = df['Daily_Return'].rolling(window=5).std()
+    df['Rolling_Mean_10'] = df['Daily_Return'].rolling(window=10).mean()
+    df['RSI_Momentum'] = df['RSI_14'] - df['RSI_14'].shift(3)
+    return df
+
+
+def add_ratio_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Price relative to moving averages — is stock above or below trend?"""
+    df['Price_to_SMA20'] = df['Close'] / df['SMA_20']
+    df['Price_to_SMA50'] = df['Close'] / df['SMA_50']
+    df['Price_to_EMA12'] = df['Close'] / df['EMA_12']
+    return df
+
 def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     Master function: applies all feature engineering steps in sequence.
@@ -160,12 +184,21 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df = add_macd(df)
     df = add_volatility(df)
     df = add_volume_features(df)
+    df = add_lag_features(df)
+    df = add_rolling_features(df)
+    df = add_ratio_features(df)   # ← new
     df = df.dropna(subset=[
     "SMA_20", "SMA_50",
+    "SMA_100", "SMA_150",
     "EMA_12", "EMA_26",
     "RSI_14",
     "MACD", "MACD_Signal", "MACD_Hist",
-    "Volatility_20",
-    "Volume_SMA_20", "Volume_Ratio"
+    "Volatility_20"
+    ,"Volume_SMA_20", "Volume_Ratio",
+    "Rolling_Mean_5", "Rolling_Std_5", "Rolling_Mean_10","RSI_Lag_1", "RSI_Lag_2", "RSI_Lag_3",
+"MACD_Lag_1", "MACD_Lag_2", "MACD_Lag_3",
+"Rolling_Mean_5", "Rolling_Std_5", "Rolling_Mean_10",
+"RSI_Momentum",
+"Price_to_SMA20", "Price_to_SMA50", "Price_to_EMA12"
 ])
     return df

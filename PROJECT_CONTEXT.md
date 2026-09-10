@@ -111,23 +111,41 @@ onward, follow the skeleton approach above.)
   "Reliance, Inc. (RS) - NYQ" result instead of NSE's RELIANCE.NS — `search_stock()` in
   `data/fetch.py` may need better filtering/prioritization for NSE-only results.
 
+  - **2026-09-11**: Completed Step 3 (baseline prediction model). Built models/train.py
+  with make_labels() (horizon=5, configurable), prepare_features(), split_time_series(),
+  train_model() (Logistic Regression, Random Forest, XGBoost with full hyperparameters),
+  and evaluate_model() with feature importance. Bumped fetch period to "max" (~7550 rows
+  for RELIANCE.NS). Added three new functions to features/engineer.py: add_lag_features()
+  (RSI/MACD lags), add_rolling_features() (rolling mean/std + RSI momentum),
+  add_ratio_features() (Price/SMA ratios). Experimented with feature sets:
+  (1) no temporal features → RF/XGBoost dropped to ~47-48%,
+  (2) top-15 features only → no improvement,
+  (3) all features restored → RF ~50%, XGBoost ~49%, Logistic ~52% but biased.
+  Accuracy ceiling hit with price/technical features alone (~50% honest baseline).
+  Sentiment data (Step 4) expected to push accuracy meaningfully higher.
+  Also cleaned up duplicate function definitions in engineer.py and duplicate
+  entries in dropna subset list.
+
 ## 7. Current State (update this section as the "latest snapshot")
 
-- **Last completed step**: Step 2 (feature engineering) - done, tested, wired into UI
-  with indicator charts (MA overlay, RSI, MACD panels), committed
-- **Next step**: Step 3 - Baseline prediction model (define label, train logistic
-  regression / random forest on engineered features) in `models/` folder. Will likely
-  need to first increase `get_price_history()` fetch period (currently ~6mo/129 rows,
-  too small for training) before starting Step 3.
+- **Last completed step**: Step 3 (baseline prediction model) — done, tested on
+  RELIANCE.NS with ~7550 rows (max history). Honest accuracy: ~50% RF/XGBoost
+  (balanced predictions), ~52% Logistic but heavily biased toward predicting "up".
+- **Next step**: Step 4 — web scraping + sentiment model. Scrape financial news
+  sites, run NLP sentiment on headlines/articles, produce a sentiment signal
+  per stock per day to fuse with price model later.
 - **Repo**: https://github.com/sulaimrazvi/stock-predictor
-- - **Open questions / decisions pending**:
-  - Confirm final fetch period to use for Step 3 model training (5y confirmed working
-    for SMA_100/150; decide default period for `get_price_history()` going forward)
+- **Open questions / decisions pending**:
+  - Accuracy improvement deferred — revisit after sentiment fusion (Step 5)
+  - UI not yet updated to show features or predictions — bundle with Step 6
+  - get_price_history() default stays "2y" for UI use; "max" only used in
+    models/train.py __main__ block for training
+  - Daily_Return is consistently the weakest feature — consider dropping it
+    at Step 5 when fusing models
 - **Known issues**:
-  - `search_stock()` in `data/fetch.py` can match wrong-market tickers (e.g. US-listed
-    "Reliance, Inc." instead of NSE's RELIANCE.NS) - needs NSE filtering/prioritization,
-    not yet fixed
-
+  - search_stock() in data/fetch.py may return non-NSE results first (e.g.
+    searching "reliance" returns US-listed "Reliance Inc (RS) - NYQ" before
+    RELIANCE.NS) — needs better NSE filtering/prioritization, not fixed yet
 ## 8. Context Snapshot (for pasting into new AI sessions)
 
 > Copy everything below this line into a new chat if starting fresh:
